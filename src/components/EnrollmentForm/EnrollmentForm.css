@@ -1,0 +1,121 @@
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+  color: red;
+  box-sizing: border-box;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  /* Hides the form that is currently out of view */
+  position: relative;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-sizing: border-box;
+}
+
+h2 {
+  text-align: center;
+  color: #1f2937;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+.form-slider {
+  display: flex;
+  width: 100%;
+  /* Take 100% of container width */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-step {
+  width: 100%;
+  /* Force each form step to take exactly 100% of slider */
+  flex-shrink: 0;
+  /* Prevents flexbox from squishing the forms together */
+  padding: 0 2px;
+  box-sizing: border-box;
+}
+
+.form-group {
+  color: red;
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s;
+  background-color: #f9fafb;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  background-color: #ffffff;
+}
+
+input[readonly] {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+button {
+  padding: 12px 15px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  flex: 1;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+button:hover {
+  background-color: #2563eb;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.back-btn {
+  background-color: #9ca3af;
+}
+
+button.back-btn:hover {
+  background-color: #6b7280;
+}
