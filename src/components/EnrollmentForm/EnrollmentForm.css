@@ -1,18 +1,17 @@
+/* src/components/EnrollmentForm/EnrollmentForm.css */
 .form-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   padding: 20px;
-  color: red;
   box-sizing: border-box;
 }
 
 .form-container {
   width: 100%;
-  max-width: 480px;
-  overflow: hidden;
-  /* Hides the form that is currently out of view */
+  max-width: 520px; /* slightly wider to fit side-by-side */
+  overflow: hidden; 
   position: relative;
   background: #ffffff;
   padding: 30px;
@@ -29,53 +28,87 @@ h2 {
   margin-bottom: 25px;
 }
 
+.form-overflow-wrapper {
+  overflow: hidden;
+  width: 100%;
+}
+
 .form-slider {
   display: flex;
-  width: 100%;
-  /* Take 100% of container width */
+  width: 200%; 
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-step {
-  width: 100%;
-  /* Force each form step to take exactly 100% of slider */
-  flex-shrink: 0;
-  /* Prevents flexbox from squishing the forms together */
-  padding: 0 2px;
+  width: 50%; 
+  flex-shrink: 0; 
+  padding: 0 5px; 
   box-sizing: border-box;
 }
 
 .form-group {
-  color: red;
   margin-bottom: 16px;
+}
+
+.horizontal-group {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.horizontal-group .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.horizontal-group .qty-group {
+  flex: 0 0 70px; /* fixed smaller width for quantity */
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  background: #e5e7eb;
+  margin: 20px 0 15px 0;
+}
+
+.section-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
 }
 
 label {
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   color: #4b5563;
 }
 
-input,
-select {
+input, select {
   width: 100%;
-  padding: 10px 14px;
+  padding: 9px 12px;
   box-sizing: border-box;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   transition: all 0.2s;
   background-color: #f9fafb;
 }
 
-input:focus,
-select:focus {
+input:focus, select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   background-color: #ffffff;
+}
+
+input:disabled, select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 input[readonly] {
@@ -83,6 +116,69 @@ input[readonly] {
   color: #9ca3af;
   cursor: not-allowed;
   border-color: #e5e7eb;
+}
+
+.add-btn {
+  background-color: #10b981;
+  margin-top: 15px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.add-btn:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.add-btn:disabled {
+  background-color: #a7f3d0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.add-button-wrapper {
+  flex: 0 0 auto ;
+  margin-bottom: 0;
+}
+
+.add-button-wrapper .add-btn {
+  width: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  margin: 0;
+  padding: 9px 10px;
+  font-size: 13px;
+}
+
+.added-items-list {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.added-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+  color: #334155;
+}
+
+.remove-btn {
+  background: transparent;
+  color: #ef4444;
+  padding: 4px 8px;
+  margin: 0;
+  flex: 0 0 auto;
+  font-size: 16px;
+}
+
+.remove-btn:hover {
+  background: #fee2e2;
 }
 
 .button-group {
@@ -104,11 +200,11 @@ button {
   transition: background-color 0.2s, transform 0.1s;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   background-color: #2563eb;
 }
 
-button:active {
+button:active:not(:disabled) {
   transform: scale(0.98);
 }
 
