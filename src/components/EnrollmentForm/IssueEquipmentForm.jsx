@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import './EnrollmentForm.css';
+import { useNavigate } from 'react-router-dom';
+import './IssueEquipmentForm.css';
+import { useUser } from '../../context/UserContext';
 
 const equipmentData = {
   Cricket: ['Bat', 'Ball', 'Stumps', 'Pads', 'Gloves', 'Helmet'],
@@ -11,8 +13,10 @@ const equipmentData = {
 
 const defaultDepartments = ['B.Tech', 'BCA', 'MCA', 'BBA', 'B.E.'];
 
-const EnrollmentForm = () => {
-  const member_id = 1;
+const IssueEquipmentForm = () => {
+  const { user } = useUser();
+  const navigate = useNavigate();
+  const member_id = user?.member_id || 1;
   const [step, setStep] = useState(1);
   const [enrollment, setEnrollment] = useState('');
 
@@ -53,7 +57,6 @@ const EnrollmentForm = () => {
 
     try {
       const response = await fetch(`http://localhost:4221/students/${enrollment.trim()}`);
-
       if (response.ok) {
         const data = await response.json();
 
@@ -72,8 +75,8 @@ const EnrollmentForm = () => {
       } else {
         setIsReadOnly(false);
         setFetchError('Student data not found for this enrollment number. Please enter details manually.');
-        setStep(2);
       }
+      setStep(2);
     } catch (err) {
       console.error('Error fetching student data:', err);
       setIsReadOnly(false);
@@ -139,7 +142,17 @@ const EnrollmentForm = () => {
   return (
     <div className="form-wrapper">
       <div className="form-container">
-        <h2>Student Registration</h2>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', position: 'relative' }}>
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="back-btn"
+            style={{ position: 'absolute', left: 0, width: 'auto', padding: '6px 12px', fontSize: '13px' }}
+          >
+            ←
+          </button>
+          <h2 style={{ width: '100%', textAlign: 'center', margin: 0 }}>Student Registration</h2>
+        </div>
         <div className="form-overflow-wrapper">
           <div
             className="form-slider"
@@ -169,11 +182,6 @@ const EnrollmentForm = () => {
             {/* Step 2 */}
             <div className="form-step">
               <form onSubmit={submitForm}>
-                {isReadOnly && (
-                  <div style={{ background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', padding: '8px 12px', borderRadius: '6px', marginBottom: '14px', fontSize: '0.82rem' }}>
-                    ✓ Student details auto-filled from database (Read-only)
-                  </div>
-                )}
                 {fetchError && (
                   <p className="error-message" style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '12px' }}>
                     {fetchError}
@@ -335,4 +343,4 @@ const EnrollmentForm = () => {
   );
 };
 
-export default EnrollmentForm;
+export default IssueEquipmentForm;
