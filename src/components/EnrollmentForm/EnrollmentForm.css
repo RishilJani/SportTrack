@@ -53,6 +53,7 @@ h2 {
 .horizontal-group {
   display: flex;
   gap: 12px;
+  margin-bottom: 10px;
   align-items: flex-start;
 }
 
@@ -133,6 +134,16 @@ input[readonly] {
   background-color: #a7f3d0;
   cursor: not-allowed;
   transform: none;
+}
+
+.equipment-row {
+  align-items: flex-end;
+}
+
+.inline-btn {
+  margin-top: 0;
+  height: 40px; /* match input height */
+  flex: 0 0 auto;
 }
 
 .add-button-wrapper {

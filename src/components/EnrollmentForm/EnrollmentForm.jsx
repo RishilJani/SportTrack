@@ -2,31 +2,84 @@ import React, { useState } from 'react';
 import './EnrollmentForm.css';
 
 const equipmentData = {
-  Cricket: ['Bat', 'Ball', 'Stumps'],
-  Badminton: ['Racket', 'Shuttlecock'],
-  Chess: ['Chess Board', 'Chess Clock'],
-  "Table Tennis": ['Table Tennis Racket', 'Table Tennis Ball']
+  Cricket: ['Bat', 'Ball', 'Stumps', 'Pads', 'Gloves', 'Helmet'],
+  Badminton: ['Racket', 'Shuttlecock', 'Net', 'Shoes'],
+  Chess: ['Chess Board', 'Chess Clock', 'Scorebook'],
+  Football: ['Football', 'Goal Nets', 'Cones', 'Shin Guards'],
+  Tennis: ['Racket', 'Tennis Ball', 'Net']
 };
 
+const defaultDepartments = ['B.Tech', 'BCA', 'MCA', 'BBA', 'B.E.'];
+
 const EnrollmentForm = () => {
+  const member_id = 1;
   const [step, setStep] = useState(1);
   const [enrollment, setEnrollment] = useState('');
 
   // Step 2 details
+  const [studentId, setStudentId] = useState('');
   const [studentName, setStudentName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [department, setDepartment] = useState('');
   const [semester, setSemester] = useState('');
+
+  // Auto-fill & Read-only state
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState('');
 
   // Selection
   const [sport, setSport] = useState('');
   const [equipment, setEquipment] = useState('');
   const [quantity, setQuantity] = useState('');
   const [addedItems, setAddedItems] = useState([]);
-  
-  const nextStep = (e) => {
+
+  const normalizeDepartment = (deptStr) => {
+    if (!deptStr) return '';
+    const lower = String(deptStr).toLowerCase().trim();
+    const match = defaultDepartments.find(
+      d => d.toLowerCase() === lower
+    );
+    return match || deptStr;
+  };
+
+  const nextStep = async (e) => {
     e.preventDefault();
-    if (enrollment.trim() !== '') {
-      setStep(2);
+    if (!enrollment.trim()) return;
+
+    setLoading(true);
+    setFetchError('');
+
+    try {
+      const response = await fetch(`http://localhost:4221/students/${enrollment.trim()}`);
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Backend returns: student_id, enrollment, student_name, phone, email, department, semester
+        setStudentId(data.student_id || data.studentId || '');
+        setStudentName(data.student_name || data.studentName || '');
+        setEmail(data.email || '');
+        setPhoneNumber(data.phone || data.phoneNumber || '');
+        setDepartment(normalizeDepartment(data.department));
+        setSemester(data.semester !== undefined && data.semester !== null ? String(data.semester) : '');
+        if (data.enrollment) {
+          setEnrollment(data.enrollment);
+        }
+
+        setIsReadOnly(true);
+      } else {
+        setIsReadOnly(false);
+        setFetchError('Student data not found for this enrollment number. Please enter details manually.');
+        setStep(2);
+      }
+    } catch (err) {
+      console.error('Error fetching student data:', err);
+      setIsReadOnly(false);
+      setFetchError('Could not fetch student data from server. Please enter details manually.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,24 +88,29 @@ const EnrollmentForm = () => {
     setStep(1);
   };
 
+  const handleEnrollmentChange = (e) => {
+    setEnrollment(e.target.value);
+    // Reset read-only status and fields if user changes enrollment number
+    if (isReadOnly) {
+      setIsReadOnly(false);
+      setStudentId('');
+      setStudentName('');
+      setEmail('');
+      setPhoneNumber('');
+      setDepartment('');
+      setSemester('');
+      setFetchError('');
+    }
+  };
+
   const handleSportChange = (e) => {
     setSport(e.target.value);
     setEquipment('');
   };
 
-  const getCurrentItem = () => {
-    if (sport && equipment && Number(quantity) > 0) {
-      return { sport, equipment, quantity: Number(quantity) };
-    }
-
-    return null;
-  };
-
   const handleAddItem = () => {
-    const currentItem = getCurrentItem();
-
-    if (currentItem) {
-      setAddedItems((previousItems) => [...previousItems, currentItem]);
+    if (sport && equipment && quantity > 0) {
+      setAddedItems([...addedItems, { sport, equipment, quantity }]);
       setEquipment('');
       setQuantity('');
     }
@@ -66,37 +124,16 @@ const EnrollmentForm = () => {
 
   const submitForm = (e) => {
     e.preventDefault();
-
-    const currentItem = getCurrentItem();
-    const finalItems = currentItem
-      ? [...addedItems, currentItem]
-      : addedItems;
-
-    setAddedItems(finalItems);
-
-    const formData = {
-      enrollment,
-      studentName,
-      department,
-      semester,
-      issuedEquipments: finalItems
+    const result = {
+      member_id,
+      student_id: studentId,
+      issuedEquipments: addedItems
     };
-
-    console.log(JSON.stringify(formData, null, 2));
-    alert('Form data logged to console! Check developer tools.');
-    clearForm();
+    console.log("Submitted Form Result Object:", result);
+    console.log(JSON.stringify(result, null, 2));
+    alert("Form data logged to console! Check developer tools.");
   };
 
-  const clearForm =()=>{
-    setEnrollment('');
-    setStudentName('');
-    setDepartment('');
-    setSemester('');
-    setSport('');
-    setEquipment('');
-    setQuantity('');
-    setAddedItems([]);
-  }
   const availableEquipments = sport && equipmentData[sport] ? equipmentData[sport] : [];
 
   return (
@@ -117,12 +154,14 @@ const EnrollmentForm = () => {
                     type="text"
                     placeholder="Enter Enrollment Number"
                     value={enrollment}
-                    onChange={(e) => setEnrollment(e.target.value)}
+                    onChange={handleEnrollmentChange}
                     required
                   />
                 </div>
                 <div className="button-group">
-                  <button type="submit">Next</button>
+                  <button type="submit" disabled={loading}>
+                    {loading ? 'Fetching...' : 'Next'}
+                  </button>
                 </div>
               </form>
             </div>
@@ -130,46 +169,113 @@ const EnrollmentForm = () => {
             {/* Step 2 */}
             <div className="form-step">
               <form onSubmit={submitForm}>
-                <div className="form-group">
-                  <label>Enrollment Number</label>
-                  <input type="text" value={enrollment} readOnly />
+                {isReadOnly && (
+                  <div style={{ background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', padding: '8px 12px', borderRadius: '6px', marginBottom: '14px', fontSize: '0.82rem' }}>
+                    ✓ Student details auto-filled from database (Read-only)
+                  </div>
+                )}
+                {fetchError && (
+                  <p className="error-message" style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '12px' }}>
+                    {fetchError}
+                  </p>
+                )}
+                <div className="horizontal-group">
+                  <div className="form-group">
+                    <label>Enrollment Number</label>
+                    <input type="text" value={enrollment} readOnly />
+                  </div>
+                  {studentId && (
+                    <div className="form-group">
+                      <label>Student ID</label>
+                      <input type="text" value={studentId} readOnly />
+                    </div>
+                  )}
                 </div>
+
                 <div className="form-group">
                   <label>Student Name</label>
-                  <input type="text" placeholder="Enter Name" value={studentName} onChange={(e) => setStudentName(e.target.value)} required />
+                  <input
+                    type="text"
+                    placeholder="Enter Name"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    readOnly={isReadOnly}
+                    required
+                  />
+                </div>
+
+                <div className="horizontal-group">
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      placeholder="Enter Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      readOnly={isReadOnly}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone Number</label>
+                    <input
+                      type="tel"
+                      placeholder="Enter Phone"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      readOnly={isReadOnly}
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="horizontal-group">
                   <div className="form-group">
                     <label>Department</label>
-                    <select required value={department} onChange={(e) => setDepartment(e.target.value)}>
+                    <select
+                      required
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      disabled={isReadOnly}
+                    >
                       <option value="">Select...</option>
-                      <option value="cs">Computer Science</option>
-                      <option value="it">Information Technology</option>
-                      <option value="mech">Mechanical</option>
-                      <option value="civil">Civil</option>
+                      {defaultDepartments.map((dept) => (
+                        <option key={dept} value={dept}>{dept}</option>
+                      ))}
+                      {department && !defaultDepartments.includes(department) && (
+                        <option value={department}>{department}</option>
+                      )}
                     </select>
                   </div>
                   <div className="form-group">
                     <label>Semester</label>
-                    <input type="number" placeholder="Sem" min="1" max="8" value={semester} onChange={(e) => setSemester(e.target.value)} required />
+                    <input
+                      type="number"
+                      placeholder="Sem"
+                      min="1"
+                      max="8"
+                      value={semester}
+                      onChange={(e) => setSemester(e.target.value)}
+                      readOnly={isReadOnly}
+                      required
+                    />
                   </div>
                 </div>
 
                 <hr className="divider" />
                 <label className="section-label">Equipments Required</label>
 
-                <div className="horizontal-group">
-                  <div className="form-group">
-                    <label>Sport</label>
-                    <select value={sport} onChange={handleSportChange}>
-                      <option value="">Select...</option>
-                      {Object.keys(equipmentData).map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                  </div>
+                <div className="form-group">
+                  <label>Sport</label>
+                  <select value={sport} onChange={handleSportChange}>
+                    <option value="">Select...</option>
+                    {Object.keys(equipmentData).map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
 
+                <div className="horizontal-group equipment-row">
                   <div className="form-group">
                     <label>Equipment</label>
                     <select
@@ -195,17 +301,14 @@ const EnrollmentForm = () => {
                     />
                   </div>
 
-                  <div className="form-group add-button-wrapper">
-                    <label>&nbsp;</label>
-                    <button
-                      type="button"
-                      className="add-btn"
-                      onClick={handleAddItem}
-                      disabled={!sport || !equipment || Number(quantity) <= 0}
-                    >
-                      + Add Equipment
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="add-btn inline-btn"
+                    onClick={handleAddItem}
+                    disabled={!sport || !equipment || !quantity}
+                  >
+                    + Add
+                  </button>
                 </div>
 
                 {addedItems.length > 0 && (
