@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IssueEquipmentForm.css';
 import { useUser } from '../../context/UserContext';
-
-const equipmentData = {
-  Cricket: ['Bat', 'Ball', 'Stumps', 'Pads', 'Gloves', 'Helmet'],
-  Badminton: ['Racket', 'Shuttlecock', 'Net', 'Shoes'],
-  Chess: ['Chess Board', 'Chess Clock', 'Scorebook'],
-  Football: ['Football', 'Goal Nets', 'Cones', 'Shin Guards'],
-  Tennis: ['Racket', 'Tennis Ball', 'Net']
-};
+import { useEquipment } from '../../context/EquipmentContext';
+import { MoveLeft } from 'lucide-react';
 
 const defaultDepartments = ['B.Tech', 'BCA', 'MCA', 'BBA', 'B.E.'];
 
 const IssueEquipmentForm = () => {
   const { user } = useUser();
+  const { categories, getByCategory } = useEquipment();
+
+  if(categories == null){
+    
+  }
+
   const navigate = useNavigate();
   const member_id = user?.member_id || 1;
   const [step, setStep] = useState(1);
@@ -137,7 +137,7 @@ const IssueEquipmentForm = () => {
     alert("Form data logged to console! Check developer tools.");
   };
 
-  const availableEquipments = sport && equipmentData[sport] ? equipmentData[sport] : [];
+  const availableEquipments = sport ? getByCategory(sport) : [];
 
   return (
     <div className="form-wrapper">
@@ -149,9 +149,10 @@ const IssueEquipmentForm = () => {
             className="back-btn"
             style={{ position: 'absolute', left: 0, width: 'auto', padding: '6px 12px', fontSize: '13px' }}
           >
-            ←
+            {/* ← */}
+            <MoveLeft />
           </button>
-          <h2 style={{ width: '100%', textAlign: 'center', margin: 0 }}>Student Registration</h2>
+          <h2 style={{ width: '100%', textAlign: 'center', margin: 0 }}>Student Issue Form</h2>
         </div>
         <div className="form-overflow-wrapper">
           <div
@@ -274,10 +275,10 @@ const IssueEquipmentForm = () => {
                 <label className="section-label">Equipments Required</label>
 
                 <div className="form-group">
-                  <label>Sport</label>
+                  <label>Sports</label>
                   <select value={sport} onChange={handleSportChange}>
                     <option value="">Select...</option>
-                    {Object.keys(equipmentData).map((s) => (
+                    {categories.map((s) => (
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
@@ -293,7 +294,7 @@ const IssueEquipmentForm = () => {
                     >
                       <option value="">Select...</option>
                       {availableEquipments.map((eq) => (
-                        <option key={eq} value={eq}>{eq}</option>
+                        <option key={eq.equipment_id} value={eq.equipment_name}>{eq.equipment_name}</option>
                       ))}
                     </select>
                   </div>

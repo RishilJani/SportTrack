@@ -220,9 +220,12 @@ button:active:not(:disabled) {
 }
 
 button.back-btn {
-  background-color: #9ca3af;
+  /* background-color: #9ca3af; */
+  background-color: white;
+  color: black;
 }
 
 button.back-btn:hover {
   background-color: #6b7280;
+  color: white;
 }

@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 import { useUser } from '../../context/UserContext';
+import { useEquipment } from '../../context/EquipmentContext';
 
 const LoginForm = () => {
   const LOGIN_URL = 'http://localhost:4221/members/login';
   const { login } = useUser();
+  const { fetchEquipments } = useEquipment();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +32,8 @@ const LoginForm = () => {
       if (response.ok) {
         const data = await response.json();
         login(data);
+        // Fire-and-forget: fetch equipment data in the background
+        fetchEquipments();
         navigate('/dashboard');
       } else {
         const errData = await response.json().catch(() => ({}));
