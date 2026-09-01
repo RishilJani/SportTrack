@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, PackagePlus, Package, Users, Trophy, Activity } from 'lucide-react';
+import CurrentIssuedList from '../CurrentIssuedList/CurrentIssuedList';
 import './Dashboard.css';
 import { useUser } from '../../context/UserContext';
 
 const Dashboard = () => {
   const { user, logout } = useUser();
   const navigate = useNavigate();
+  const [totalIssuedCount, setTotalIssuedCount] = useState(null);
 
   const handleLogout = () => {
     logout();
@@ -36,7 +38,7 @@ const Dashboard = () => {
             <h3>Total Issued</h3>
             <Package size={20} className="stat-icon" color="#3b82f6" />
           </div>
-          <div className="stat-value">24</div>
+          <div className="stat-value">{totalIssuedCount === null ? '...' : totalIssuedCount}</div>
         </div>
         <div className="stat-card" style={{ borderLeftColor: '#10b981' }}>
           <div className="stat-card-header">
@@ -70,6 +72,8 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
+
+      <CurrentIssuedList onCountUpdate={setTotalIssuedCount} />
     </div>
   );
 };
