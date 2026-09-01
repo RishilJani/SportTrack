@@ -41,7 +41,7 @@ const LoginForm = () => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Could not connect to backend server (http://localhost:4221/login).');
+      setError('Could not connect to backend server');
     } finally {
       setLoading(false);
     }
