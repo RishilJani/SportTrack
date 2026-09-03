@@ -4,7 +4,7 @@ import { UserProvider, useUser } from './context/UserContext';
 import { EquipmentProvider } from './context/EquipmentContext';
 import LoginForm from './components/LoginForm/LoginForm';
 import Dashboard from './components/Dashboard/Dashboard';
-import IssueEquipmentForm from './components/EnrollmentForm/IssueEquipmentForm';
+import IssueEquipmentForm from './components/IssueEquipmentForm/IssueEquipmentForm';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useUser();

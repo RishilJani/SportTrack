@@ -11,9 +11,6 @@ const IssueEquipmentForm = () => {
   const { user } = useUser();
   const { categories, getByCategory } = useEquipment();
 
-  if(categories == null){
-    
-  }
 
   const navigate = useNavigate();
   const member_id = user?.member_id || 1;
@@ -36,7 +33,7 @@ const IssueEquipmentForm = () => {
   // Selection
   const [sport, setSport] = useState('');
   const [equipment, setEquipment] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [issuequantity, setIssueQuantity] = useState('');
   const [addedItems, setAddedItems] = useState([]);
 
   const normalizeDepartment = (deptStr) => {
@@ -112,10 +109,10 @@ const IssueEquipmentForm = () => {
   };
 
   const handleAddItem = () => {
-    if (sport && equipment && quantity > 0) {
-      setAddedItems([...addedItems, { sport, equipment, quantity }]);
+    if (sport && equipment && issuequantity > 0) {
+      setAddedItems([...addedItems, { sport, equipment, issuequantity }]);
       setEquipment('');
-      setQuantity('');
+      setIssueQuantity('');
     }
   };
 
@@ -304,8 +301,8 @@ const IssueEquipmentForm = () => {
                     <input
                       type="number"
                       min="1"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
+                      value={issuequantity}
+                      onChange={(e) => setIssueQuantity(e.target.value)}
                       disabled={!equipment}
                     />
                   </div>
@@ -314,7 +311,7 @@ const IssueEquipmentForm = () => {
                     type="button"
                     className="add-btn inline-btn"
                     onClick={handleAddItem}
-                    disabled={!sport || !equipment || !quantity}
+                    disabled={!sport || !equipment || !issuequantity}
                   >
                     + Add
                   </button>
@@ -324,7 +321,7 @@ const IssueEquipmentForm = () => {
                   <div className="added-items-list">
                     {addedItems.map((item, index) => (
                       <div className="added-item" key={index}>
-                        <span><strong>{item.sport}</strong>: {item.equipment} (x{item.quantity})</span>
+                        <span><strong>{item.sport}</strong>: {item.equipment} (x{item.issuequantity})</span>
                         <button type="button" className="remove-btn" onClick={() => handleRemoveItem(index)}>✕</button>
                       </div>
                     ))}

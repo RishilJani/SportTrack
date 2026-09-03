@@ -41,7 +41,7 @@ const CurrentIssuedList = ({ onCountUpdate }) => {
       day: 'numeric',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
+      minute: '2-digit',x 
     });
   };
 
@@ -82,7 +82,7 @@ const CurrentIssuedList = ({ onCountUpdate }) => {
           <table className="issued-table">
             <thead>
               <tr>
-                <th>Issue ID</th>
+                <th>Sr.</th>
                 <th>Student Info</th>
                 <th>Equipments Issued</th>
                 <th>Issued By</th>
@@ -90,15 +90,15 @@ const CurrentIssuedList = ({ onCountUpdate }) => {
               </tr>
             </thead>
             <tbody>
-              {issuedList.map((item) => (
+              {issuedList.map((item, index) => (
                 <tr key={item.issue_id}>
-                  <td className="issue-id-cell">#{item.issue_id}</td>
+                  <td className="issue-id-cell">#{index + 1}</td>
                   <td>
                     <div className="student-info">
                       <span className="student-name">{item.student_name}</span>
                       <div className="student-subtext">
-                        <span>Enroll: {item.enrollment}</span>
-                        {item.phone && <span> • Ph: {item.phone}</span>}
+                        <div>Enroll: {item.enrollment}</div>
+                        {item.phone && <div>Phone: {item.phone}</div>}
                       </div>
                     </div>
                   </td>
@@ -107,7 +107,7 @@ const CurrentIssuedList = ({ onCountUpdate }) => {
                       {item.equipments && item.equipments.map((eq, idx) => (
                         <span key={idx} className="equipment-tag">
                           {eq.equipment_name}
-                          <span className="qty-badge">x{eq.quantity}</span>
+                          <span className="qty-badge">x{eq.issued_quantity}</span>
                         </span>
                       ))}
                     </div>
