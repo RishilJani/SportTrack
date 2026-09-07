@@ -5,6 +5,7 @@ import { EquipmentProvider } from './context/EquipmentContext';
 import LoginForm from './components/LoginForm/LoginForm';
 import Dashboard from './components/Dashboard/Dashboard';
 import IssueEquipmentForm from './components/IssueEquipmentForm/IssueEquipmentForm';
+import EquipmentsPage from './components/EquipmentsPage/EquipmentsPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useUser();
@@ -42,6 +43,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <IssueEquipmentForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/equipments"
+                element={
+                  <ProtectedRoute>
+                    <EquipmentsPage />
                   </ProtectedRoute>
                 }
               />

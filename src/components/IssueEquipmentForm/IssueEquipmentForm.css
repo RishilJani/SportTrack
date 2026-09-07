@@ -10,11 +10,11 @@
 
 .form-container {
   width: 100%;
-  max-width: 520px; /* slightly wider to fit side-by-side */
+  max-width: 640px; /* increased width */
   overflow: hidden; 
   position: relative;
   background: #ffffff;
-  padding: 30px;
+  padding: 30px 35px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

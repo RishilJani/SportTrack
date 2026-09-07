@@ -201,9 +201,11 @@ const CurrentIssuedList = ({ onCountUpdate }) => {
                         <span>{item.member_name || `Member #${item.member_id}`}</span>
                       </div>
                     </td>
-                    <td className="time-cell">
-                      <Clock size={13} color="#6b7280" />
-                      <span>{formatDate(item.issue_time)}</span>
+                    <td>
+                      <div className='time-cell'>
+                        <Clock size={14} color="#6b7280" />
+                        <span>{formatDate(item.issue_time)}</span>
+                      </div>
                     </td>
                     <td>
                       <button className="return-action-btn" onClick={() => handleOpenReturnModal(item)}>

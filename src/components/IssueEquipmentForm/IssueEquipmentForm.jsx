@@ -35,6 +35,10 @@ const IssueEquipmentForm = () => {
   const [equipment, setEquipment] = useState('');
   const [issuequantity, setIssueQuantity] = useState('');
   const [addedItems, setAddedItems] = useState([]);
+  const [itemError, setItemError] = useState('');
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const normalizeDepartment = (deptStr) => {
     if (!deptStr) return '';
@@ -108,11 +112,25 @@ const IssueEquipmentForm = () => {
     setEquipment('');
   };
 
+  const availableEquipments = sport ? getByCategory(sport) : [];
+
   const handleAddItem = () => {
     if (sport && equipment && issuequantity > 0) {
-      setAddedItems([...addedItems, { sport, equipment, issuequantity }]);
+      const foundEq = availableEquipments.find(e => e.equipment_name === equipment);
+      setAddedItems([
+        ...addedItems,
+        {
+          equipment_id: foundEq ? foundEq.equipment_id : null,
+          equipment_name: equipment,
+          quantity: parseInt(issuequantity, 10) || 1,
+          sport,
+          equipment,
+          issuequantity
+        }
+      ]);
       setEquipment('');
       setIssueQuantity('');
+      setItemError('');
     }
   };
 
@@ -122,19 +140,47 @@ const IssueEquipmentForm = () => {
     setAddedItems(newItems);
   };
 
-  const submitForm = (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
-    const result = {
-      member_id,
-      student_id: studentId,
-      issuedEquipments: addedItems
-    };
-    console.log("Submitted Form Result Object:", result);
-    console.log(JSON.stringify(result, null, 2));
-    alert("Form data logged to console! Check developer tools.");
-  };
+    if (addedItems.length === 0) {
+      setItemError('Please select and add at least one equipment to issue.');
+      return;
+    }
+    setItemError('');
+    setSubmitError('');
+    setSubmitting(true);
 
-  const availableEquipments = sport ? getByCategory(sport) : [];
+    const payload = {
+      member_id: Number(member_id),
+      student_id: studentId ? Number(studentId) : null,
+      issuedEquipments: addedItems.map(item => ({
+        equipment_id: item.equipment_id,
+        issue_quantity: Number(item.quantity || item.issuequantity)
+      })),
+    };
+
+    try {
+      const response = await fetch('http://localhost:4221/issue/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        navigate('/dashboard');
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        setSubmitError(errData.message || errData.error || `Server returned status ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Error submitting issue form:', err);
+      setSubmitError('Failed to connect to backend server. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="form-wrapper">
@@ -180,6 +226,11 @@ const IssueEquipmentForm = () => {
             {/* Step 2 */}
             <div className="form-step">
               <form onSubmit={submitForm}>
+                {submitError && (
+                  <p className="error-message" style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '12px' }}>
+                    {submitError}
+                  </p>
+                )}
                 {fetchError && (
                   <p className="error-message" style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '12px' }}>
                     {fetchError}
@@ -317,6 +368,12 @@ const IssueEquipmentForm = () => {
                   </button>
                 </div>
 
+                {itemError && (
+                  <p className="error-message" style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '8px', marginBottom: '8px' }}>
+                    {itemError}
+                  </p>
+                )}
+
                 {addedItems.length > 0 && (
                   <div className="added-items-list">
                     {addedItems.map((item, index) => (
@@ -329,8 +386,10 @@ const IssueEquipmentForm = () => {
                 )}
 
                 <div className="button-group" style={{ marginTop: '30px' }}>
-                  <button type="button" onClick={prevStep} className="back-btn">Back</button>
-                  <button type="submit">Submit</button>
+                  <button type="button" onClick={prevStep} className="back-btn" disabled={submitting}>Back</button>
+                  <button type="submit" disabled={submitting}>
+                    {submitting ? 'Submitting...' : 'Submit'}
+                  </button>
                 </div>
               </form>
             </div>
