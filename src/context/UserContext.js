@@ -3,12 +3,13 @@ import React, { createContext, useContext, useState } from 'react';
 const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
+  const SPORT_MEMBER = "sport_member";
   const [user, setUser] = useState(() => {
     try {
-      const storedUser = localStorage.getItem('user');
+      const storedUser = sessionStorage.getItem(SPORT_MEMBER);
       return storedUser ? JSON.parse(storedUser) : null;
     } catch (error) {
-      console.warn("Could not read user from localStorage", error);
+      console.warn("Could not read user from sessionStorage", error);
       return null;
     }
   });
@@ -21,12 +22,12 @@ export const UserProvider = ({ children }) => {
       email: userData.email || ''
     };
     setUser(newUser);
-    localStorage.setItem('user', JSON.stringify(newUser));
+    sessionStorage.setItem(SPORT_MEMBER, JSON.stringify(newUser));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    sessionStorage.removeItem(SPORT_MEMBER);
   };
 
   return (

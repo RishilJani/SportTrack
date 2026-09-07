@@ -1,11 +1,19 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const EQUIPMENT_API_URL = 'http://localhost:4221/equipments';
+const STORAGE_KEY = 'sport_equipments';
 
 const EquipmentContext = createContext(null);
 
 export const EquipmentProvider = ({ children }) => {
-  const [equipments, setEquipments] = useState([]);
+  const [equipments, setEquipments] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -21,7 +29,9 @@ export const EquipmentProvider = ({ children }) => {
       })
       .then((data) => {
         // data: [{ equipment_id, equipment_name, category }, ...]
-        setEquipments(data);
+        const list = Array.isArray(data) ? data : [];
+        setEquipments(list);
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
       })
       .catch((err) => {
         console.error('Background equipment fetch failed:', err);
@@ -31,6 +41,10 @@ export const EquipmentProvider = ({ children }) => {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    fetchEquipments();
+  }, [fetchEquipments]);
 
   // Group equipments by category for easy lookup
   const getByCategory = useCallback((category) => {

@@ -9,16 +9,21 @@ const defaultDepartments = ['B.Tech', 'BCA', 'MCA', 'BBA', 'B.E.'];
 
 const IssueEquipmentForm = () => {
   const { user } = useUser();
-  const { categories, getByCategory } = useEquipment();
+  const { categories, getByCategory, fetchEquipments } = useEquipment();
+
+  useEffect(() => {
+    fetchEquipments();
+  }, [fetchEquipments]);
 
   const navigate = useNavigate();
   const member_id = user?.member_id || 1;
   const [step, setStep] = useState(1);
   const [enrollment, setEnrollment] = useState('');
 
-  const enrollmentInputRef = useRef(null);
-  const barcodeBuffer = useRef('');
-  const lastKeyTime = useRef(0);
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [manualEnrollment, setManualEnrollment] = useState('');
+
+  const barcodeInputRef = useRef(null);
 
   // Step 2 details
   const [studentId, setStudentId] = useState('');
@@ -52,8 +57,6 @@ const IssueEquipmentForm = () => {
     return match || deptStr;
   };
 
-  const scanTimerRef = useRef(null);
-
   const fetchStudentByEnrollment = useCallback(async (enrollmentVal) => {
     const trimmed = (enrollmentVal || '').trim();
     if (!trimmed) return;
@@ -68,10 +71,10 @@ const IssueEquipmentForm = () => {
         const data = await response.json();
 
         // Backend returns: student_id, enrollment, student_name, phone, email, department, semester
-        setStudentId(data.student_id || '');
-        setStudentName(data.student_name || '');
+        setStudentId(data.student_id || data.studentId || '');
+        setStudentName(data.student_name || data.studentName || '');
         setEmail(data.email || '');
-        setPhoneNumber(data.phone || '');
+        setPhoneNumber(data.phone || data.phoneNumber || '');
         setDepartment(normalizeDepartment(data.department));
         setSemester(data.semester !== undefined && data.semester !== null ? String(data.semester) : '');
         if (data.enrollment) {
@@ -93,93 +96,39 @@ const IssueEquipmentForm = () => {
     }
   }, []);
 
-  const nextStep = (e) => {
+  // Handler for Manual Enrollment Entry (ONLY fetches on explicit submit/button click)
+  const handleManualSubmit = (e) => {
     if (e) e.preventDefault();
-    if (!enrollment.trim()) return;
-    fetchStudentByEnrollment(enrollment);
+    if (!manualEnrollment.trim()) return;
+    fetchStudentByEnrollment(manualEnrollment);
   };
 
-  // Auto-focus input on step 1
+  // Handler for Barcode Scan Entry
+  const handleBarcodeSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (!barcodeInput.trim()) return;
+    fetchStudentByEnrollment(barcodeInput);
+  };
+
+  const handleBarcodeKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (barcodeInput.trim()) {
+        fetchStudentByEnrollment(barcodeInput.trim());
+      }
+    }
+  };
+
+  // Auto-focus barcode input on step 1
   useEffect(() => {
-    if (step === 1 && enrollmentInputRef.current) {
-      enrollmentInputRef.current.focus();
+    if (step === 1 && barcodeInputRef.current) {
+      barcodeInputRef.current.focus();
     }
   }, [step]);
-
-  // Global barcode listener for hardware barcode scanners
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (step !== 1) return;
-
-      if (e.key === 'Enter' || e.key === 'Tab') {
-        if (barcodeBuffer.current.length >= 3) {
-          e.preventDefault();
-          const scannedCode = barcodeBuffer.current.trim();
-          barcodeBuffer.current = '';
-          if (scannedCode) {
-            fetchStudentByEnrollment(scannedCode);
-          }
-        } else {
-          barcodeBuffer.current = '';
-        }
-      } else if (e.key.length === 1) {
-        const currentTime = Date.now();
-        const timeDiff = currentTime - lastKeyTime.current;
-
-        if (timeDiff > 200) {
-          barcodeBuffer.current = e.key;
-        } else {
-          barcodeBuffer.current += e.key;
-        }
-        lastKeyTime.current = currentTime;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [step, fetchStudentByEnrollment]);
 
   const prevStep = (e) => {
     e.preventDefault();
     setStep(1);
-  };
-
-  const handleEnrollmentChange = (e) => {
-    const val = e.target.value;
-    setEnrollment(val);
-
-    // Reset read-only status and fields if user changes enrollment number
-    if (isReadOnly) {
-      setIsReadOnly(false);
-      setStudentId('');
-      setStudentName('');
-      setEmail('');
-      setPhoneNumber('');
-      setDepartment('');
-      setSemester('');
-      setFetchError('');
-    }
-
-    // Auto-fetch if rapid typing / barcode scanning pauses (300ms debounce for 3+ chars)
-    if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
-    if (val.trim().length >= 3) {
-      scanTimerRef.current = setTimeout(() => {
-        // Automatically trigger fetch if 3+ characters entered
-        fetchStudentByEnrollment(val.trim());
-      }, 350);
-    }
-  };
-
-  const handleEnrollmentKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === 'Tab') {
-      if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
-      if (enrollment.trim()) {
-        e.preventDefault();
-        fetchStudentByEnrollment(enrollment.trim());
-      }
-    }
   };
 
   const handleSportChange = (e) => {
@@ -188,7 +137,6 @@ const IssueEquipmentForm = () => {
   };
 
   const availableEquipments = sport ? getByCategory(sport) : [];
-
   const handleAddItem = () => {
     if (sport && equipment && issuequantity > 0) {
       const foundEq = availableEquipments.find(e => e.equipment_name === equipment);
@@ -279,33 +227,57 @@ const IssueEquipmentForm = () => {
           >
             {/* Step 1 */}
             <div className="form-step">
-              <form onSubmit={nextStep}>
-                <div className="form-group">
-                  <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Enrollment Number</span>
-                    <span style={{ fontSize: '11px', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px', background: '#eff6ff', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bfdbfe' }}>
-                      <Barcode size={14} /> Ready for Barcode Scan
-                    </span>
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      ref={enrollmentInputRef}
-                      type="text"
-                      placeholder="Scan Barcode or Enter Enrollment Number"
-                      value={enrollment}
-                      onChange={handleEnrollmentChange}
-                      onKeyDown={handleEnrollmentKeyDown}
-                      required
-                      autoFocus
-                    />
+              <div className="entry-options-container">
+                {/* Option 1: Barcode Scan */}
+                <form onSubmit={handleBarcodeSubmit} className="entry-option-card">
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: '600', color: '#1f2937' }}>Barcode Scan</span>
+                      <span style={{ fontSize: '11px', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px', background: '#eff6ff', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bfdbfe' }}>
+                        <Barcode size={14} /> Auto-Scan Active
+                      </span>
+                    </label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        ref={barcodeInputRef}
+                        type="text"
+                        placeholder="Scan barcode with scanner..."
+                        value={barcodeInput}
+                        onChange={(e) => setBarcodeInput(e.target.value)}
+                        onKeyDown={handleBarcodeKeyDown}
+                        style={{ flex: 1 }}
+                      />
+                      <button type="submit" disabled={loading || !barcodeInput.trim()} style={{ width: 'auto', whiteSpace: 'nowrap' }}>
+                        {loading ? 'Fetching...' : 'Scan & Fetch'}
+                      </button>
+                    </div>
                   </div>
+                </form>
+
+                <div className="or-divider" style={{ textAlign: 'center', margin: '20px 0', color: '#9ca3af', fontWeight: '600', fontSize: '12px', position: 'relative' }}>
+                  <span style={{ background: '#ffffff', padding: '0 12px', position: 'relative', zIndex: 1, letterSpacing: '1px' }}>OR</span>
+                  <hr style={{ position: 'absolute', top: '50%', left: 0, right: 0, border: 'none', borderTop: '1px solid #e5e7eb', margin: 0 }} />
                 </div>
-                <div className="button-group">
-                  <button type="submit" disabled={loading}>
-                    {loading ? 'Fetching...' : 'Next'}
-                  </button>
-                </div>
-              </form>
+
+                {/* Option 2: Manual Enrollment Entry */}
+                <form onSubmit={handleManualSubmit} className="entry-option-card">
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label style={{ fontWeight: '600', color: '#1f2937', marginBottom: '8px', display: 'block' }}>Manual Enrollment Entry</label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        type="text"
+                        placeholder="Type Enrollment Number manually..."
+                        value={manualEnrollment}
+                        onChange={(e) => setManualEnrollment(e.target.value)}
+                        style={{ flex: 1 }}
+                      />
+                      <button type="submit" disabled={loading || !manualEnrollment.trim()} style={{ width: 'auto', whiteSpace: 'nowrap' }}>
+                        {loading ? 'Fetching...' : 'Fetch Student'}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
 
             {/* Step 2 */}
