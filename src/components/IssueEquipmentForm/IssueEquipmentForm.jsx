@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IssueEquipmentForm.css';
 import { useUser } from '../../context/UserContext';
 import { useEquipment } from '../../context/EquipmentContext';
-import { MoveLeft } from 'lucide-react';
+import { MoveLeft, Barcode } from 'lucide-react';
 
 const defaultDepartments = ['B.Tech', 'BCA', 'MCA', 'BBA', 'B.E.'];
 
@@ -11,11 +11,14 @@ const IssueEquipmentForm = () => {
   const { user } = useUser();
   const { categories, getByCategory } = useEquipment();
 
-
   const navigate = useNavigate();
   const member_id = user?.member_id || 1;
   const [step, setStep] = useState(1);
   const [enrollment, setEnrollment] = useState('');
+
+  const enrollmentInputRef = useRef(null);
+  const barcodeBuffer = useRef('');
+  const lastKeyTime = useRef(0);
 
   // Step 2 details
   const [studentId, setStudentId] = useState('');
@@ -49,15 +52,18 @@ const IssueEquipmentForm = () => {
     return match || deptStr;
   };
 
-  const nextStep = async (e) => {
-    e.preventDefault();
-    if (!enrollment.trim()) return;
+  const scanTimerRef = useRef(null);
+
+  const fetchStudentByEnrollment = useCallback(async (enrollmentVal) => {
+    const trimmed = (enrollmentVal || '').trim();
+    if (!trimmed) return;
 
     setLoading(true);
     setFetchError('');
+    setEnrollment(trimmed);
 
     try {
-      const response = await fetch(`http://localhost:4221/students/${enrollment.trim()}`);
+      const response = await fetch(`http://localhost:4221/students/${trimmed}`);
       if (response.ok) {
         const data = await response.json();
 
@@ -85,7 +91,55 @@ const IssueEquipmentForm = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const nextStep = (e) => {
+    if (e) e.preventDefault();
+    if (!enrollment.trim()) return;
+    fetchStudentByEnrollment(enrollment);
   };
+
+  // Auto-focus input on step 1
+  useEffect(() => {
+    if (step === 1 && enrollmentInputRef.current) {
+      enrollmentInputRef.current.focus();
+    }
+  }, [step]);
+
+  // Global barcode listener for hardware barcode scanners
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (step !== 1) return;
+
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        if (barcodeBuffer.current.length >= 3) {
+          e.preventDefault();
+          const scannedCode = barcodeBuffer.current.trim();
+          barcodeBuffer.current = '';
+          if (scannedCode) {
+            fetchStudentByEnrollment(scannedCode);
+          }
+        } else {
+          barcodeBuffer.current = '';
+        }
+      } else if (e.key.length === 1) {
+        const currentTime = Date.now();
+        const timeDiff = currentTime - lastKeyTime.current;
+
+        if (timeDiff > 200) {
+          barcodeBuffer.current = e.key;
+        } else {
+          barcodeBuffer.current += e.key;
+        }
+        lastKeyTime.current = currentTime;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [step, fetchStudentByEnrollment]);
 
   const prevStep = (e) => {
     e.preventDefault();
@@ -93,7 +147,9 @@ const IssueEquipmentForm = () => {
   };
 
   const handleEnrollmentChange = (e) => {
-    setEnrollment(e.target.value);
+    const val = e.target.value;
+    setEnrollment(val);
+
     // Reset read-only status and fields if user changes enrollment number
     if (isReadOnly) {
       setIsReadOnly(false);
@@ -104,6 +160,25 @@ const IssueEquipmentForm = () => {
       setDepartment('');
       setSemester('');
       setFetchError('');
+    }
+
+    // Auto-fetch if rapid typing / barcode scanning pauses (300ms debounce for 3+ chars)
+    if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
+    if (val.trim().length >= 3) {
+      scanTimerRef.current = setTimeout(() => {
+        // Automatically trigger fetch if 3+ characters entered
+        fetchStudentByEnrollment(val.trim());
+      }, 350);
+    }
+  };
+
+  const handleEnrollmentKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
+      if (enrollment.trim()) {
+        e.preventDefault();
+        fetchStudentByEnrollment(enrollment.trim());
+      }
     }
   };
 
@@ -206,14 +281,24 @@ const IssueEquipmentForm = () => {
             <div className="form-step">
               <form onSubmit={nextStep}>
                 <div className="form-group">
-                  <label>Enrollment Number</label>
-                  <input
-                    type="text"
-                    placeholder="Enter Enrollment Number"
-                    value={enrollment}
-                    onChange={handleEnrollmentChange}
-                    required
-                  />
+                  <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Enrollment Number</span>
+                    <span style={{ fontSize: '11px', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '4px', background: '#eff6ff', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bfdbfe' }}>
+                      <Barcode size={14} /> Ready for Barcode Scan
+                    </span>
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      ref={enrollmentInputRef}
+                      type="text"
+                      placeholder="Scan Barcode or Enter Enrollment Number"
+                      value={enrollment}
+                      onChange={handleEnrollmentChange}
+                      onKeyDown={handleEnrollmentKeyDown}
+                      required
+                      autoFocus
+                    />
+                  </div>
                 </div>
                 <div className="button-group">
                   <button type="submit" disabled={loading}>
