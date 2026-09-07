@@ -169,52 +169,63 @@ const CurrentIssuedList = ({ onCountUpdate }) => {
                   <th>Equipments Issued</th>
                   <th>Issued By</th>
                   <th>Issue Time</th>
+                  <th>Due Time</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {issuedList.map((item, index) => (
-                  <tr key={item.issue_id}>
-                    <td className="issue-id-cell">#{index + 1}</td>
-                    <td>
-                      <div className="student-info">
-                        <span className="student-name">{item.student_name}</span>
-                        <div className="student-subtext">
-                          <div>Enroll: {item.enrollment}</div>
-                          {item.phone && <div>Phone: {item.phone}</div>}
+                {issuedList.map((item, index) => {
+                  const isOverdue = item.due_time && new Date() > new Date(item.due_time);
+                  return (
+                    <tr key={item.issue_id} className={isOverdue ? 'row-overdue' : ''}>
+                      <td className="issue-id-cell">#{index + 1}</td>
+                      <td>
+                        <div className="student-info">
+                          <span className="student-name">{item.student_name}</span>
+                          <div className="student-subtext">
+                            <div>Enroll: {item.enrollment}</div>
+                            {item.phone && <div>Phone: {item.phone}</div>}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="equipment-tags">
-                        {item.equipments && item.equipments.map((eq, idx) => (
-                          <span key={idx} className="equipment-tag">
-                            {eq.equipment_name}
-                            <span className="qty-badge">x{eq.issued_quantity || eq.quantity}</span>
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="member-info">
-                        <UserCheck size={14} color="#6b7280" />
-                        <span>{item.member_name || `Member #${item.member_id}`}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className='time-cell'>
-                        <Clock size={14} color="#6b7280" />
-                        <span>{formatDate(item.issue_time)}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <button className="return-action-btn" onClick={() => handleOpenReturnModal(item)}>
-                        <MoveLeft size={14} />
-                        Return
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td>
+                        <div className="equipment-tags">
+                          {item.equipments && item.equipments.map((eq, idx) => (
+                            <span key={idx} className="equipment-tag">
+                              {eq.equipment_name}
+                              <span className="qty-badge">x{eq.issued_quantity || eq.quantity}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="member-info">
+                          <UserCheck size={14} color="#6b7280" />
+                          <span>{item.member_name || `Member #${item.member_id}`}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className='time-cell'>
+                          <Clock size={14} color="#6b7280" />
+                          <span>{formatDate(item.issue_time)}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className={`time-cell ${isOverdue ? 'overdue-time' : ''}`}>
+                          <Clock size={14} color={isOverdue ? '#ef4444' : '#6b7280'} />
+                          <span>{formatDate(item.due_time)}</span>
+                          {isOverdue && <span className="overdue-badge">Overdue</span>}
+                        </div>
+                      </td>
+                      <td>
+                        <button className="return-action-btn" onClick={() => handleOpenReturnModal(item)}>
+                          <MoveLeft size={14} />
+                          Return
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

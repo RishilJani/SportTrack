@@ -68,10 +68,10 @@ const IssueEquipmentForm = () => {
         const data = await response.json();
 
         // Backend returns: student_id, enrollment, student_name, phone, email, department, semester
-        setStudentId(data.student_id || data.studentId || '');
-        setStudentName(data.student_name || data.studentName || '');
+        setStudentId(data.student_id || '');
+        setStudentName(data.student_name || '');
         setEmail(data.email || '');
-        setPhoneNumber(data.phone || data.phoneNumber || '');
+        setPhoneNumber(data.phone || '');
         setDepartment(normalizeDepartment(data.department));
         setSemester(data.semester !== undefined && data.semester !== null ? String(data.semester) : '');
         if (data.enrollment) {
