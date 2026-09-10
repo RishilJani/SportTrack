@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm/LoginForm';
 import Dashboard from './components/Dashboard/Dashboard';
 import IssueEquipmentForm from './components/IssueEquipmentForm/IssueEquipmentForm';
 import EquipmentsPage from './components/EquipmentsPage/EquipmentsPage';
+import EquipmentStockReport from './components/EquipmentStockReport/EquipmentStockReport';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useUser();
@@ -51,6 +52,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EquipmentsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/equipment-report"
+                element={
+                  <ProtectedRoute>
+                    <EquipmentStockReport />
                   </ProtectedRoute>
                 }
               />

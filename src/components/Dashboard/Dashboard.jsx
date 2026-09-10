@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, PackagePlus, Package, Users, Trophy, Activity, Boxes } from 'lucide-react';
+import { LogOut, PackagePlus, Package, Users, Trophy, Activity, Boxes, FileText } from 'lucide-react';
 import CurrentIssuedList from '../CurrentIssuedList/CurrentIssuedList';
 import './Dashboard.css';
 import { useUser } from '../../context/UserContext';
 
 const Dashboard = () => {
-  const { user, logout } = useUser();
+  const { user, logout } = useUser(); 
   const navigate = useNavigate();
   const [totalIssuedCount, setTotalIssuedCount] = useState(null);
 
@@ -73,6 +73,10 @@ const Dashboard = () => {
           <button onClick={() => navigate('/equipments')} className="action-btn" style={{ backgroundColor: '#10b981' }}>
             <Boxes size={18} />
             View Equipments
+          </button>
+          <button onClick={() => navigate('/equipment-report')} className="action-btn" style={{ backgroundColor: '#8b5cf6' }}>
+            <FileText size={18} />
+            Stock Report
           </button>
         </div>
       </div>
