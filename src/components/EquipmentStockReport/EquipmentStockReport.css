@@ -119,6 +119,14 @@
   cursor: not-allowed;
 }
 
+.generate-excel-btn {
+  background-color: #03cc03;
+}
+
+.generate-excel-btn:hover:not(:disabled) {
+  background-color: #088608;
+}
+
 /* Stats Summary Cards Grid */
 .report-stats-grid {
   display: grid;
@@ -169,12 +177,35 @@
 }
 
 /* Stat Icon Colors */
-.report-stat-card.opening .stat-icon { background-color: #eff6ff; color: #2563eb; }
-.report-stat-card.added .stat-icon { background-color: #ecfdf5; color: #059669; }
-.report-stat-card.lost .stat-icon { background-color: #fef2f2; color: #dc2626; }
-.report-stat-card.damaged .stat-icon { background-color: #fff7ed; color: #ea580c; }
-.report-stat-card.disposed .stat-icon { background-color: #f3f4f6; color: #4b5563; }
-.report-stat-card.closing .stat-icon { background-color: #f0fdf4; color: #16a34a; }
+.report-stat-card.opening .stat-icon {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.report-stat-card.added .stat-icon {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.report-stat-card.lost .stat-icon {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.report-stat-card.damaged .stat-icon {
+  background-color: #fff7ed;
+  color: #ea580c;
+}
+
+.report-stat-card.disposed .stat-icon {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.report-stat-card.closing .stat-icon {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
 
 /* Table Styling */
 .table-responsive {
@@ -221,12 +252,35 @@
   color: #111827;
 }
 
-.val-opening { font-weight: 600; color: #2563eb; }
-.val-added { font-weight: 600; color: #059669; }
-.val-lost { font-weight: 600; color: #dc2626; }
-.val-damaged { font-weight: 600; color: #ea580c; }
-.val-disposed { font-weight: 600; color: #6b7280; }
-.val-closing { font-weight: 700; color: #16a34a; }
+.val-opening {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.val-added {
+  font-weight: 600;
+  color: #059669;
+}
+
+.val-lost {
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.val-damaged {
+  font-weight: 600;
+  color: #ea580c;
+}
+
+.val-disposed {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.val-closing {
+  font-weight: 700;
+  color: #16a34a;
+}
 
 .grand-total-row {
   background-color: #f8fafc;
@@ -241,7 +295,8 @@
 }
 
 /* Loading & Empty States */
-.report-loading, .report-empty {
+.report-loading,
+.report-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -266,6 +321,11 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

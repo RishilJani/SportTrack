@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EquipmentStockReport.css';
-import { MoveLeft, Calendar, RefreshCw, BarChart2, Package, PlusCircle, AlertTriangle, ShieldAlert, Trash2 } from 'lucide-react';
+import { MoveLeft, Calendar, RefreshCw, BarChart2, Package, PlusCircle, AlertTriangle, ShieldAlert, Trash2, Sheet } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const API_BASE = 'http://localhost:4221/equipments/report';
 
@@ -60,6 +61,61 @@ const EquipmentStockReport = () => {
     fetchReport();
   };
 
+  const generateExcel = (e) => {
+
+    const toNumber = (value) => Number(value) || 0;
+    const exportRows = reportData.map((equipment) => ({
+      "Equipment Name": equipment.equipment_name,
+      "Opening Stock": toNumber(equipment.opening_stock),
+      Added: toNumber(equipment.added),
+      Lost: toNumber(equipment.lost),
+      Damaged: toNumber(equipment.damaged),
+      Disposed: toNumber(equipment.disposed),
+      "Closing Stock": toNumber(equipment.closing_stock),
+    }));
+
+    exportRows.push({
+      "Equipment Name": "Grand Total",
+      "Opening Stock": totals.opening_stock,
+      Added: totals.added,
+      Lost: totals.lost,
+      Damaged: totals.damaged,
+      Disposed: totals.disposed,
+      "Closing Stock": totals.closing_stock,
+    });
+    console.log("ExportRows = ", exportRows);
+
+    const workSheet = XLSX.utils.json_to_sheet(exportRows);
+    // Set column widths based on header titles (adding a small padding)
+    workSheet['!cols'] = [
+      { wch: "Equipment Name".length + 2 },
+      { wch: "Opening Stock".length + 2 },
+      { wch: "Added".length + 2 },
+      { wch: "Lost".length + 2 },
+      { wch: "Damaged".length + 2 },
+      { wch: "Disposed".length + 2 },
+      { wch: "Closing Stock".length + 2 },
+    ];
+    workSheet["!autofilter"] = {
+      ref: XLSX.utils.encode_range({
+        s: { r: 0, c: 0 },
+        e: { r: reportData.length, c: 0 },
+      }),
+    };
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(
+      workbook,
+      workSheet,
+      "Equipment Stock"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `equipment_stock_report_${fromDate}_${toDate}.xlsx`
+    );
+
+  }
+
   // Grand Totals
   const totals = reportData.reduce(
     (acc, curr) => ({
@@ -114,10 +170,20 @@ const EquipmentStockReport = () => {
             />
           </div>
 
-          <button type="submit" disabled={loading} className="fetch-report-btn">
-            <RefreshCw size={14} className={loading ? 'spinning' : ''} />
-            {loading ? 'Fetching...' : 'Generate Report'}
-          </button>
+          <div>
+            <button type="submit" disabled={loading} className="fetch-report-btn">
+              <RefreshCw size={14} className={loading ? 'spinning' : ''} />
+              {loading ? 'Fetching...' : 'Generate Report'}
+            </button>
+          </div>
+
+          <div>
+            <button type="button" disabled={loading} className="fetch-report-btn generate-excel-btn" onClick={generateExcel}>
+              <Sheet size={14} />
+              Generate Excel
+            </button>
+          </div>
+
         </form>
       </div>
 
