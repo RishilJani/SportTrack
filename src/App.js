@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm/LoginForm';
 import Dashboard from './components/Dashboard/Dashboard';
 import IssueEquipmentForm from './components/IssueEquipmentForm/IssueEquipmentForm';
 import EquipmentsPage from './components/EquipmentsPage/EquipmentsPage';
+import AddEquipmentPage from './components/AddEquipmentPage/AddEquipmentPage';
 import EquipmentStockReport from './components/EquipmentStockReport/EquipmentStockReport';
 
 const ProtectedRoute = ({ children }) => {
@@ -55,6 +56,15 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/equipments/add"
+                element={
+                  <ProtectedRoute>
+                    <AddEquipmentPage />
+                  </ProtectedRoute>
+                }
+              />
+
               <Route
                 path="/equipment-report"
                 element={

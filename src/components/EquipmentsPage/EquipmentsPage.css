@@ -56,6 +56,35 @@
   font-size: 14px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.add-equipment-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.add-equipment-btn:hover {
+  background-color: #059669;
+}
+
+.add-equipment-btn:active {
+  transform: scale(0.98);
+}
+
 .refresh-btn {
   display: flex;
   align-items: center;
@@ -85,8 +114,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Inventory Controls */

@@ -83,7 +83,6 @@ const EquipmentStockReport = () => {
       Disposed: totals.disposed,
       "Closing Stock": totals.closing_stock,
     });
-    console.log("ExportRows = ", exportRows);
 
     const workSheet = XLSX.utils.json_to_sheet(exportRows);
     // Set column widths based on header titles (adding a small padding)

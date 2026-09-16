@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoveLeft, Search, RefreshCw, Loader2, AlertCircle, Package, Layers, CheckCircle2, Clock, Trophy } from 'lucide-react';
+import { MoveLeft, Search, RefreshCw, Loader2, AlertCircle, Package, Layers, CheckCircle2, Clock, Trophy, Plus } from 'lucide-react';
 import './EquipmentsPage.css';
 
 const EquipmentsPage = () => {
@@ -113,7 +113,16 @@ const EquipmentsPage = () => {
             <p>Overview of total, issued, and available sports equipment</p>
           </div>
         </div>
-        <div>
+
+
+        <div className="header-actions">
+          <button
+            onClick={() => navigate('/equipments/add')}
+            className="add-equipment-btn"
+            title="Add Equipment" >
+            <Plus size={16} />
+            Add Equipment
+          </button>
           <button onClick={fetchData} className="refresh-btn" disabled={loading} title="Refresh Inventory">
             <RefreshCw size={16} className={loading ? 'spinning' : ''} />
             Refresh
