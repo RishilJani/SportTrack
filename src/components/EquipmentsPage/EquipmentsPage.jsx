@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoveLeft, Search, RefreshCw, Loader2, AlertCircle, Package, Layers, CheckCircle2, Clock, Trophy, Plus } from 'lucide-react';
+import { MoveLeft, Search, RefreshCw, Loader2, AlertCircle, Package, Layers, CheckCircle2, Clock, Trophy, PackagePlus, FolderPlus } from 'lucide-react';
 import './EquipmentsPage.css';
 
 const EquipmentsPage = () => {
@@ -117,11 +117,20 @@ const EquipmentsPage = () => {
 
         <div className="header-actions">
           <button
-            onClick={() => navigate('/equipments/add')}
-            className="add-equipment-btn"
-            title="Add Equipment" >
-            <Plus size={16} />
-            Add Equipment
+            onClick={() => navigate('/equipments/add-stock')}
+            className="add-stock-btn"
+            title="Add Stock to Existing Equipment"
+          >
+            <PackagePlus size={16} />
+            Add Stock
+          </button>
+          <button
+            onClick={() => navigate('/equipments/add-category')}
+            className="add-category-btn"
+            title="Add New Category & Equipments"
+          >
+            <FolderPlus size={16} />
+            Add Category
           </button>
           <button onClick={fetchData} className="refresh-btn" disabled={loading} title="Refresh Inventory">
             <RefreshCw size={16} className={loading ? 'spinning' : ''} />

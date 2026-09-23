@@ -62,6 +62,52 @@
   gap: 12px;
 }
 
+.add-stock-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.add-stock-btn:hover {
+  background-color: #059669;
+}
+
+.add-stock-btn:active {
+  transform: scale(0.98);
+}
+
+.add-category-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.add-category-btn:hover {
+  background-color: #4f46e5;
+}
+
+.add-category-btn:active {
+  transform: scale(0.98);
+}
+
 .add-equipment-btn {
   display: flex;
   align-items: center;

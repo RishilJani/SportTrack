@@ -198,7 +198,7 @@ input[readonly] {
   margin-top: 25px;
 }
 
-button {
+.form-container button {
   padding: 12px 15px;
   background-color: #3b82f6;
   color: white;
@@ -211,21 +211,20 @@ button {
   transition: background-color 0.2s, transform 0.1s;
 }
 
-button:hover:not(:disabled) {
+.form-container button:hover:not(:disabled) {
   background-color: #2563eb;
 }
 
-button:active:not(:disabled) {
+.form-container button:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-button.back-btn {
-  /* background-color: #9ca3af; */
+.form-container button.back-btn {
   background-color: white;
   color: black;
 }
 
-button.back-btn:hover {
+.form-container button.back-btn:hover {
   background-color: #6b7280;
   color: white;
 }
