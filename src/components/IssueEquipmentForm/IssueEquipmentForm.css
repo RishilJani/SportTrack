@@ -10,8 +10,9 @@
 
 .form-container {
   width: 100%;
-  max-width: 640px; /* increased width */
-  overflow: hidden; 
+  max-width: 640px;
+  /* increased width */
+  overflow: hidden;
   position: relative;
   background: #ffffff;
   padding: 30px 35px;
@@ -35,14 +36,14 @@ h2 {
 
 .form-slider {
   display: flex;
-  width: 200%; 
+  width: 200%;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-step {
-  width: 50%; 
-  flex-shrink: 0; 
-  padding: 0 5px; 
+  width: 50%;
+  flex-shrink: 0;
+  padding: 0 5px;
   box-sizing: border-box;
 }
 
@@ -63,7 +64,8 @@ h2 {
 }
 
 .horizontal-group .qty-group {
-  flex: 0 0 70px; /* fixed smaller width for quantity */
+  flex: 0 0 70px;
+  /* fixed smaller width for quantity */
 }
 
 .divider {
@@ -88,7 +90,8 @@ label {
   color: #4b5563;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 9px 12px;
   box-sizing: border-box;
@@ -99,14 +102,16 @@ input, select {
   background-color: #f9fafb;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   background-color: #ffffff;
 }
 
-input:disabled, select:disabled {
+input:disabled,
+select:disabled {
   background-color: #f3f4f6;
   cursor: not-allowed;
   opacity: 0.7;
@@ -119,21 +124,39 @@ input[readonly] {
   border-color: #e5e7eb;
 }
 
+/* Specific styling for the Add Equipment (+ Add) button */
+.form-container button.add-btn,
+.form-container .add-btn,
 .add-btn {
-  background-color: #10b981;
-  margin-top: 15px;
-  padding: 10px;
-  font-size: 14px;
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  padding: 8px 16px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
+  flex: 0 0 auto !important;
+  height: 40px !important;
 }
 
+.form-container button.add-btn:hover:not(:disabled),
+.form-container .add-btn:hover:not(:disabled),
 .add-btn:hover:not(:disabled) {
-  background-color: #059669;
+  background-color: #059669 !important;
 }
 
+.form-container button.add-btn:disabled,
+.form-container .add-btn:disabled,
 .add-btn:disabled {
-  background-color: #a7f3d0;
-  cursor: not-allowed;
-  transform: none;
+  background-color: #a7f3d0 !important;
+  color: #ffffff !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
 }
 
 .equipment-row {
@@ -142,12 +165,13 @@ input[readonly] {
 
 .inline-btn {
   margin-top: 0;
-  height: 40px; /* match input height */
+  height: 40px;
+  /* match input height */
   flex: 0 0 auto;
 }
 
 .add-button-wrapper {
-  flex: 0 0 auto ;
+  flex: 0 0 auto;
   margin-bottom: 0;
 }
 
@@ -179,17 +203,35 @@ input[readonly] {
   color: #334155;
 }
 
+/* Specific styling for the Remove (✕) button */
+.form-container button.remove-btn,
+.form-container .remove-btn,
 .remove-btn {
-  background: transparent;
-  color: #ef4444;
-  padding: 4px 8px;
-  margin: 0;
-  flex: 0 0 auto;
-  font-size: 16px;
+  background-color: #fee2e2 !important;
+  color: #ef4444 !important;
+  border: 1px solid #fecaca !important;
+  padding: 2px 7px !important;
+  margin: 0 !important;
+  flex: 0 0 auto !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  height: auto !important;
+  min-width: unset !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
 }
 
+.form-container button.remove-btn:hover,
+.form-container .remove-btn:hover,
 .remove-btn:hover {
-  background: #fee2e2;
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
 }
 
 .button-group {

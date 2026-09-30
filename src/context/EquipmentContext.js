@@ -2,8 +2,28 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const EQUIPMENT_API_URL = 'http://localhost:4221/equipments';
 const STORAGE_KEY = 'sport_equipments';
+const CATEGORIES_STORAGE_KEY = 'sport_categories';
 
 const EquipmentContext = createContext(null);
+
+// Helper to extract unique { category_id, category_name } objects from equipment list
+const extractCategories = (list) => {
+  const catMap = new Map();
+  (Array.isArray(list) ? list : []).forEach((item) => {
+    const catId = item.category_id;
+    const catName = item.category_name;
+    if (catId != null || catName) {
+      const key = String(catId);
+      if (!catMap.has(key)) {
+        catMap.set(key, {
+          category_id: catId,
+          category_name: catName,
+        });
+      }
+    }
+  });
+  return Array.from(catMap.values());
+};
 
 export const EquipmentProvider = ({ children }) => {
   const [equipments, setEquipments] = useState(() => {
@@ -14,6 +34,21 @@ export const EquipmentProvider = ({ children }) => {
       return [];
     }
   });
+
+  const [categories, setCategories] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem(CATEGORIES_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      // Fallback extraction from cached equipments
+      const storedEq = sessionStorage.getItem(STORAGE_KEY);
+      return storedEq ? extractCategories(JSON.parse(storedEq)) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -28,10 +63,14 @@ export const EquipmentProvider = ({ children }) => {
         return res.json();
       })
       .then((data) => {
-        // data: [{ equipment_id, equipment_name, category }, ...]
+        // data: [{ equipment_id, equipment_name, quantity, category_id, category_name }, ...]
         const list = Array.isArray(data) ? data : [];
         setEquipments(list);
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+
+        const extractedCategories = extractCategories(list);
+        setCategories(extractedCategories);
+        sessionStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(extractedCategories));
       })
       .catch((err) => {
         console.error('Background equipment fetch failed:', err);
@@ -46,19 +85,29 @@ export const EquipmentProvider = ({ children }) => {
     fetchEquipments();
   }, [fetchEquipments]);
 
-  // Group equipments by category for easy lookup
+  // Group equipments by category for easy lookup (matches by category_name, category, or category_id)
   const getByCategory = useCallback((category) => {
+    if (!category) return [];
+    const search = category.toString().toUpperCase().trim();
     return equipments.filter(
-      (eq) => eq.category?.toUpperCase() === category?.toUpperCase()
+      (eq) =>
+        (eq.category_name && eq.category_name.toUpperCase().trim() === search) ||
+        (eq.category && eq.category.toUpperCase().trim() === search) ||
+        (eq.category_id != null && String(eq.category_id) === search)
     );
   }, [equipments]);
 
-  // Get unique categories
-  const categories = [...new Set(equipments.map((eq) => eq.category))];
-
   return (
     <EquipmentContext.Provider
-      value={{ equipments, categories, loading, error, fetchEquipments, getByCategory }}
+      value={{
+        equipments,
+        categories,
+        setCategories,
+        loading,
+        error,
+        fetchEquipments,
+        getByCategory,
+      }}
     >
       {children}
     </EquipmentContext.Provider>
@@ -74,3 +123,4 @@ export const useEquipment = () => {
 };
 
 export default EquipmentContext;
+

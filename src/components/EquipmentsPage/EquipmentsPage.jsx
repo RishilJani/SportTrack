@@ -85,7 +85,7 @@ const EquipmentsPage = () => {
 
   // Group by Category
   const groupedEquipments = filteredEquipments.reduce((acc, eq) => {
-    const cat = eq.category || 'Uncategorized';
+    const cat = eq.category_name || 'Uncategorized';
     if (!acc[cat]) {
       acc[cat] = [];
     }
@@ -94,7 +94,7 @@ const EquipmentsPage = () => {
   }, {});
 
   // Overall Stats
-  const categoriesCount = new Set(processedEquipments.map((eq) => eq.category || 'Uncategorized')).size;
+  const categoriesCount = new Set(processedEquipments.map((eq) => eq.category_name || 'Uncategorized')).size;
   const totalTypes = processedEquipments.length;
   const grandTotalItems = processedEquipments.reduce((sum, item) => sum + item.total_quantity, 0);
   const grandIssuedItems = processedEquipments.reduce((sum, item) => sum + item.issued_quantity, 0);

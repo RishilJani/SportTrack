@@ -383,9 +383,15 @@ const IssueEquipmentForm = () => {
                   <label>Sports</label>
                   <select value={sport} onChange={handleSportChange}>
                     <option value="">Select...</option>
-                    {categories.map((s) => (
-                      <option key={s} value={s}>{s}</option>
-                    ))}
+                    {categories.map((s) => {
+                      const name = typeof s === 'object' ? s.category_name : s;
+                      const key = typeof s === 'object' ? (s.category_id ?? s.category_name) : s;
+                      return (
+                        <option key={key} value={name}>
+                          {name}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 
@@ -436,7 +442,9 @@ const IssueEquipmentForm = () => {
                     {addedItems.map((item, index) => (
                       <div className="added-item" key={index}>
                         <span><strong>{item.sport}</strong>: {item.equipment} (x{item.issuequantity})</span>
-                        <button type="button" className="remove-btn" onClick={() => handleRemoveItem(index)}>✕</button>
+                        <span>
+                          <button type="button" className="remove-btn" onClick={() => handleRemoveItem(index)}>✕</button>
+                        </span>
                       </div>
                     ))}
                   </div>
