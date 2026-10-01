@@ -9,6 +9,7 @@ import EquipmentsPage from './components/EquipmentsPage/EquipmentsPage';
 import AddStockPage from './components/AddStockPage/AddStockPage';
 import AddCategoryPage from './components/AddCategoryPage/AddCategoryPage';
 import EquipmentStockReport from './components/EquipmentStockReport/EquipmentStockReport';
+import PastIssueRecords from './components/PastIssueRecords/PastIssueRecords';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useUser();
@@ -79,6 +80,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EquipmentStockReport />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/issue-history"
+                element={
+                  <ProtectedRoute>
+                    <PastIssueRecords />
                   </ProtectedRoute>
                 }
               />

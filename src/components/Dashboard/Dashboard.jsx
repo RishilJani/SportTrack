@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, PackagePlus, Package, Users, Trophy, Activity, Boxes, FileText } from 'lucide-react';
+import { LogOut, PackagePlus, Package, Users, Trophy, Activity, Boxes, FileText, History } from 'lucide-react';
 import CurrentIssuedList from '../CurrentIssuedList/CurrentIssuedList';
 import './Dashboard.css';
 import { useUser } from '../../context/UserContext';
@@ -77,6 +77,10 @@ const Dashboard = () => {
           <button onClick={() => navigate('/equipment-report')} className="action-btn" style={{ backgroundColor: '#8b5cf6' }}>
             <FileText size={18} />
             Stock Report
+          </button>
+          <button onClick={() => navigate('/issue-history')} className="action-btn" style={{ backgroundColor: '#0284c7' }}>
+            <History size={18} />
+            Issue History
           </button>
         </div>
       </div>
