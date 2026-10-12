@@ -387,8 +387,19 @@
   vertical-align: middle;
 }
 
-.history-table tbody tr:hover {
-  background-color: #f9fafb;
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f0f7ff !important;
+}
+
+.student-name-simple {
+  font-weight: 600;
+  color: #111827;
+  font-size: 14px;
 }
 
 .row-sr {
@@ -405,36 +416,15 @@
   border-radius: 4px;
 }
 
-/* Student Details Cell */
-.student-details {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.student-name {
-  font-weight: 600;
-  color: #111827;
-  font-size: 14px;
-}
-
-.student-meta {
-  font-size: 12px;
-  color: #6b7280;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-/* Equipment Tags */
+/* Equipment Tags in Table */
 .equipment-tags-container {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  max-width: 380px;
+  max-width: 340px;
 }
 
-.eq-item-tag {
+.eq-item-tag.simple {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -455,34 +445,7 @@
   color: #2563eb;
 }
 
-.eq-returned-qty {
-  font-size: 11px;
-  background: #dcfce7;
-  color: #166534;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-weight: 600;
-}
-
-.eq-damaged-qty {
-  font-size: 11px;
-  background: #fee2e2;
-  color: #991b1b;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-weight: 600;
-}
-
-.eq-lost-qty {
-  font-size: 11px;
-  background: #fef3c7;
-  color: #92400e;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-weight: 600;
-}
-
-/* Member Info Cell */
+/* Member & Time Cells */
 .member-info,
 .time-info {
   display: flex;
@@ -523,10 +486,26 @@
   border: 1px solid #fde68a;
 }
 
-.return-time-subtext {
-  font-size: 11px;
-  color: #6b7280;
-  margin-left: 2px;
+/* View Detail Button */
+.view-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.view-detail-btn:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
 }
 
 /* Loading, Error & Empty States */
@@ -557,4 +536,278 @@
 .text-muted {
   color: #9ca3af;
   font-size: 12px;
+}
+
+/* Modal Dialog Styles */
+.record-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.record-modal-content {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 620px;
+  max-height: 88vh;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.record-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-title-wrap h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #111827;
+  font-weight: 700;
+}
+
+.modal-id-badge {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #bfdbfe;
+}
+
+.record-modal-content .close-modal-btn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.record-modal-content .close-modal-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.record-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.info-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-value.highlight {
+  font-size: 15px;
+  color: #111827;
+  font-weight: 700;
+}
+
+.inline-icon {
+  color: #6b7280;
+}
+
+/* Equipment Breakdown in Modal */
+.modal-equipments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-equipment-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.modal-eq-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.modal-eq-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.modal-issued-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.return-quantities-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.qty-box {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qty-box.returned {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.qty-box.damaged.has-issue {
+  background: #fff7ed;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+
+.qty-box.lost.has-issue {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+.qty-box .qty-num {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.qty-box .qty-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.pending-return-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.record-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 24px;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0 0 12px 12px;
+}
+
+.btn-modal-close {
+  background-color: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 7px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-modal-close:hover {
+  background-color: #f3f4f6;
+  color: #111827;
 }

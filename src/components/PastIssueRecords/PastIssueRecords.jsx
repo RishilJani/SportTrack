@@ -14,7 +14,12 @@ import {
   ChevronLeft,
   ChevronRight,
   UserCheck,
-  AlertCircle
+  AlertCircle,
+  X,
+  User,
+  Phone,
+  GraduationCap,
+  Eye,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -35,6 +40,7 @@ const PastIssueRecords = () => {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'RETURNED' | 'PENDING'
+  const [selectedRecord, setSelectedRecord] = useState(null);
 
   // Fetch data for the selected date
   const fetchRecords = useCallback(async (date) => {
@@ -46,6 +52,7 @@ const PastIssueRecords = () => {
       const response = await fetch(`${API_BASE}?date=${date}`);
       if (response.ok) {
         const data = await response.json();
+        console.log("data = ", data);
         setRecords(Array.isArray(data) ? data : []);
       } else {
         const errJson = await response.json().catch(() => ({}));
@@ -417,49 +424,39 @@ const PastIssueRecords = () => {
               <thead>
                 <tr>
                   <th>Sr.</th>
-                  <th>Student Info</th>
+                  <th>Student Name</th>
                   <th>Equipments Issued</th>
                   <th>Issued By</th>
                   <th>Issue Time</th>
                   <th>Return Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRecords.map((item, index) => {
                   const isReturned = Boolean(item.return_time);
                   return (
-                    <tr key={item.issue_id || index}>
+                    <tr
+                      key={item.issue_id || index}
+                      className="clickable-row"
+                      onClick={() => setSelectedRecord(item)}
+                      title="Click to view full details"
+                    >
                       <td className="row-sr">
                         <span className="issue-id-badge">#{item.issue_id || index + 1}</span>
                       </td>
                       <td>
-                        <div className="student-details">
-                          <span className="student-name">
-                            {item.student?.student_name || 'Unknown Student'}
-                          </span>
-                          <div className="student-meta">
-                            <span>Enroll: {item.student?.enrollment || 'N/A'}</span>
-                            {item.student?.department && <span>• {item.student.department}</span>}
-                            {item.student?.phone && <span>• 📞 {item.student.phone}</span>}
-                          </div>
-                        </div>
+                        <span className="student-name-simple">
+                          {item.student?.student_name || 'Unknown Student'}
+                        </span>
                       </td>
                       <td>
                         <div className="equipment-tags-container">
                           {item.equipments && item.equipments.length > 0 ? (
                             item.equipments.map((eq, eqIdx) => (
-                              <div key={eq.equipment_id || eqIdx} className="eq-item-tag">
+                              <div key={eq.equipment_id || eqIdx} className="eq-item-tag simple">
                                 <span className="eq-name">{eq.equipment_name}</span>
-                                <span className="eq-issued-qty">Qty: {eq.issued_quantity}</span>
-                                {eq.returned_quantity > 0 && (
-                                  <span className="eq-returned-qty">Ret: {eq.returned_quantity}</span>
-                                )}
-                                {eq.damaged_quantity > 0 && (
-                                  <span className="eq-damaged-qty">Damaged: {eq.damaged_quantity}</span>
-                                )}
-                                {eq.lost_quantity > 0 && (
-                                  <span className="eq-lost-qty">Lost: {eq.lost_quantity}</span>
-                                )}
+                                <span className="eq-issued-qty">x{eq.issued_quantity}</span>
                               </div>
                             ))
                           ) : (
@@ -488,17 +485,26 @@ const PastIssueRecords = () => {
                             <span className="status-badge returned">
                               <CheckCircle2 size={13} /> Returned
                             </span>
-                            <span className="return-time-subtext">
-                              {formatDateTime(item.return_time)}
-                            </span>
                           </div>
                         ) : (
                           <div className="status-badge-container">
                             <span className="status-badge pending">
-                              <Clock size={13} /> In Use / Pending
+                              <Clock size={13} /> Pending
                             </span>
                           </div>
                         )}
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="view-detail-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRecord(item);
+                          }}
+                        >
+                          <Eye size={14} /> View
+                        </button>
                       </td>
                     </tr>
                   );
@@ -508,6 +514,169 @@ const PastIssueRecords = () => {
           </div>
         )}
       </div>
+
+      {/* Detail Dialog Modal */}
+      {selectedRecord && (
+        <div className="record-modal-overlay" onClick={() => setSelectedRecord(null)}>
+          <div className="record-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="record-modal-header">
+              <div className="modal-title-wrap">
+                <h3>Issue Record Details</h3>
+                <span className="modal-id-badge">#{selectedRecord.issue_id}</span>
+              </div>
+              <button
+                type="button"
+                className="close-modal-btn"
+                onClick={() => setSelectedRecord(null)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="record-modal-body">
+              {/* Student Details Section */}
+              <div className="modal-section">
+                <h4 className="section-title">
+                  <User size={16} /> Student Information
+                </h4>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="info-label">Student Name</span>
+                    <span className="info-value highlight">
+                      {selectedRecord.student?.student_name || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Enrollment No.</span>
+                    <span className="info-value">
+                      <GraduationCap size={14} className="inline-icon" />
+                      {selectedRecord.student?.enrollment || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Department</span>
+                    <span className="info-value">
+                      {selectedRecord.student?.department || 'N/A'}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Phone Number</span>
+                    <span className="info-value">
+                      <Phone size={14} className="inline-icon" />
+                      {selectedRecord.student?.phone || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Equipment & Return Breakdown Section */}
+              <div className="modal-section">
+                <h4 className="section-title">
+                  <Package size={16} /> Equipments & Return Breakdown
+                </h4>
+
+                {selectedRecord.equipments && selectedRecord.equipments.length > 0 ? (
+                  <div className="modal-equipments-list">
+                    {selectedRecord.equipments.map((eq, idx) => {
+                      const isReturned = Boolean(selectedRecord.return_time);
+                      return (
+                        <div key={eq.equipment_id || idx} className="modal-equipment-card">
+                          <div className="modal-eq-header">
+                            <span className="modal-eq-name">{eq.equipment_name}</span>
+                            <span className="modal-issued-badge">Issued: {eq.issued_quantity}</span>
+                          </div>
+
+                          {isReturned ? (
+                            <div className="return-quantities-row">
+                              <div className="qty-box returned">
+                                <span className="qty-label">Returned</span>
+                                <span className="qty-num">{eq.returned_quantity ?? 0}</span>
+                              </div>
+                              <div className={`qty-box damaged ${(eq.damaged_quantity || 0) > 0 ? 'has-issue' : ''}`}>
+                                <span className="qty-label">Damaged</span>
+                                <span className="qty-num">{eq.damaged_quantity ?? 0}</span>
+                              </div>
+                              <div className={`qty-box lost ${(eq.lost_quantity || 0) > 0 ? 'has-issue' : ''}`}>
+                                <span className="qty-label">Lost</span>
+                                <span className="qty-num">{eq.lost_quantity ?? 0}</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="pending-return-notice">
+                              <Clock size={14} /> Equipment currently with student (Pending return)
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-muted">No equipment records available.</p>
+                )}
+              </div>
+
+              {/* Issue & Return Metadata */}
+              <div className="modal-section">
+                <h4 className="section-title">
+                  <Clock size={16} /> Transaction Details
+                </h4>
+                <div className="info-grid">
+                  <div className="info-item">
+                    <span className="info-label">Issued By</span>
+                    <span className="info-value">
+                      <UserCheck size={14} className="inline-icon" />
+                      {selectedRecord.member?.member_name ||
+                        (selectedRecord.member?.member_id
+                          ? `Member #${selectedRecord.member.member_id}`
+                          : 'Staff')}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Issue Time</span>
+                    <span className="info-value">
+                      {formatDateTime(selectedRecord.issue_time)}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Return Status</span>
+                    <span className="info-value">
+                      {selectedRecord.return_time ? (
+                        <span className="status-badge returned">
+                          <CheckCircle2 size={13} /> Returned
+                        </span>
+                      ) : (
+                        <span className="status-badge pending">
+                          <Clock size={13} /> Pending
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Return Time</span>
+                    <span className="info-value">
+                      {selectedRecord.return_time
+                        ? formatDateTime(selectedRecord.return_time)
+                        : 'Not yet returned (Pending)'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+
+            <div className="record-modal-footer">
+              <button
+                type="button"
+                className="btn-modal-close"
+                onClick={() => setSelectedRecord(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
