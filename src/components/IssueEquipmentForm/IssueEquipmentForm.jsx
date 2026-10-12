@@ -172,6 +172,10 @@ const IssueEquipmentForm = () => {
     setItemError('');
     setSubmitError('');
     setSubmitting(true);
+    // Check if any added item belongs to the "badminton" category
+    const hasBadminton = addedItems.some(
+      item => item.sport.toLowerCase() === 'badminton'
+    );
 
     const payload = {
       member_id: Number(member_id),
@@ -180,6 +184,9 @@ const IssueEquipmentForm = () => {
         equipment_id: item.equipment_id,
         issue_quantity: Number(item.quantity || item.issuequantity)
       })),
+      ...(hasBadminton && {
+        due_time: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+      }),
     };
 
     try {
@@ -204,6 +211,7 @@ const IssueEquipmentForm = () => {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="form-wrapper">
@@ -298,12 +306,6 @@ const IssueEquipmentForm = () => {
                     <label>Enrollment Number</label>
                     <input type="text" value={enrollment} readOnly />
                   </div>
-                  {studentId && (
-                    <div className="form-group">
-                      <label>Student ID</label>
-                      <input type="text" value={studentId} readOnly />
-                    </div>
-                  )}
                 </div>
 
                 <div className="form-group">
