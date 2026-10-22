@@ -179,7 +179,18 @@ const IssueEquipmentForm = () => {
 
     const payload = {
       member_id: Number(member_id),
-      student_id: studentId ? Number(studentId) : null,
+      ...(studentId
+        ? { student_id: Number(studentId) }
+        : {
+          student: {
+            enrollment: enrollment,
+            student_name: studentName,
+            email: email,
+            phone: phoneNumber,
+            department: department,
+            semester: semester ? Number(semester) : null,
+          },
+        }),
       issuedEquipments: addedItems.map(item => ({
         equipment_id: item.equipment_id,
         issue_quantity: Number(item.quantity || item.issuequantity)
