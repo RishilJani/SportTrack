@@ -75,6 +75,7 @@ const CurrentIssuedList = ({ onCountUpdate }) => {
     setSubmitError(null);
 
     const equipment_list = returnFormData.map((eq) => ({
+      "equipment_id": eq.equipment_id,
       "issue_record_id": eq.issue_record_id,
       "returned_quantity": eq.returned_quantity || 0,
       "damaged_quantity": eq.damaged_quantity || 0,

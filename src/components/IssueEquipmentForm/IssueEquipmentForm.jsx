@@ -17,7 +17,7 @@ const IssueEquipmentForm = () => {
 
   const navigate = useNavigate();
   const member_id = user?.member_id || 1;
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1); // 1 AND 2
   const [enrollment, setEnrollment] = useState('');
 
   const [barcodeInput, setBarcodeInput] = useState('');
@@ -128,7 +128,11 @@ const IssueEquipmentForm = () => {
 
   const prevStep = (e) => {
     e.preventDefault();
-    setStep(1);
+    if(step === 2){
+      setStep(1);
+    }else{
+      navigate("/dashboard");
+    }
   };
 
   const handleSportChange = (e) => {
@@ -230,11 +234,10 @@ const IssueEquipmentForm = () => {
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', position: 'relative' }}>
           <button
             type="button"
-            onClick={() => navigate('/dashboard')}
+            onClick={prevStep}
             className="back-btn"
             style={{ position: 'absolute', left: 0, width: 'auto', padding: '6px 12px', fontSize: '13px' }}
           >
-            {/* ← */}
             <MoveLeft />
           </button>
           <h2 style={{ width: '100%', textAlign: 'center', margin: 0 }}>Student Issue Form</h2>
@@ -464,10 +467,10 @@ const IssueEquipmentForm = () => {
                 )}
 
                 <div className="button-group" style={{ marginTop: '30px' }}>
-                  <button type="button" onClick={prevStep} className="back-btn" disabled={submitting}>Back</button>
-                  <button type="submit" disabled={submitting}>
+                  {/* {step === 1 && <button type="button" onClick={prevStep} className="back-btn" disabled={submitting}>Back</button>} */}
+                  {step === 2 && <button type="submit" disabled={submitting}>
                     {submitting ? 'Submitting...' : 'Submit'}
-                  </button>
+                  </button>}
                 </div>
               </form>
             </div>
